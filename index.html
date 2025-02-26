@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding URL Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: #fff5f8;
+            color: #4a4a4a;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-family: sans-serif;
+            font-size: 2.5rem;
+            color: #e91e63;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #e91e63;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ffe3ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #e91e63;
+        }
+
+        .generate-btn {
+            background: #e91e63;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #fff9fb;
+            border-radius: 8px;
+            border: 2px dashed #ffe3ed;
+            display: none;
+        }
+
+        #generated-url {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ffe3ed;
+            border-radius: 8px;
+            margin: 1rem 0;
+            background: white;
+            color: #e91e63;
+            font-weight: 500;
+        }
+
+        .copy-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #45a049;
+        }
+
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .theme-card {
+            padding: 1rem;
+            border: 2px solid #ffe3ed;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-card.selected {
+            border-color: #e91e63;
+            background: #fff9fb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Free Wedding Generator by WJF</h1>
+            <p>Create your personalized wedding website link in seconds!</p>
+        </div>
+
+        <div class="form-group">
+            <label for="groom">Groom's Name</label>
+            <input type="text" id="groom" placeholder="John Doe">
+        </div>
+
+        <div class="form-group">
+            <label for="bride">Bride's Name</label>
+            <input type="text" id="bride" placeholder="Jane Smith">
+        </div>
+
+        <div class="form-group">
+            <label>Select Theme</label>
+            <div class="theme-options">
+                <div class="theme-card" onclick="selectTheme('rose')">
+                    🌹 Rose
+                </div>
+                <div class="theme-card" onclick="selectTheme('lily')">
+                    💮 Lily
+                </div>
+            </div>
+        </div>
+
+        <button class="generate-btn" onclick="generateURL()">Generate Your Wedding URL</button>
+
+        <div class="result-box" id="resultBox">
+            <h3>Your Unique Wedding URL:</h3>
+            <input type="text" id="generated-url" readonly>
+            <button class="copy-btn" onclick="copyURL()">Copy URL</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedTheme = 'rose';
+
+        function selectTheme(theme) {
+            selectedTheme = theme;
+            document.querySelectorAll('.theme-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+
+        function generateURL() {
+            const currentBaseUrl = window.location.href.split('/').slice(0, -1).join('/');
+            const baseUrl = `${currentBaseUrl}/themes/`;
+            const groom = encodeURIComponent(document.getElementById('groom').value.trim());
+            const bride = encodeURIComponent(document.getElementById('bride').value.trim());
+
+            if (!groom || !bride) {
+                alert('Please enter both names');
+                return;
+            }
+
+            const fullUrl = `${baseUrl}${selectedTheme}/index.html?groom=${groom}&bride=${bride}`;
+            document.getElementById('generated-url').value = fullUrl;
+            document.getElementById('resultBox').style.display = 'block';
+        }
+
+        async function copyURL() {
+            const urlField = document.getElementById('generated-url');
+            try {
+                await navigator.clipboard.writeText(urlField.value);
+                alert('URL copied to clipboard!');
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
+        }
+    </script>
+</body>
+</html>
